@@ -4,8 +4,8 @@
 		<title>Incremental Learning</title>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
-		<link rel="stylesheet" href="assets/css/main.css" />
-		<noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
+		<link rel="stylesheet" href="../static/assets/css/main.css" />
+		<noscript><link rel="stylesheet" href="../static/assets/css/noscript.css" /></noscript>
 	</head>
 	<body class="is-preload">
 
@@ -38,10 +38,11 @@
 					</section>
 
 				<!-- One -->
+				<form method="post" name="form">
 					<section id="one" class="wrapper style2 fullscreen spotlights">
 						<section>
 							<a id="ImgHolder" href="#" class="image">
-								<img src="images/pic01.jpg" id="output" alt="" data-position="center center" />
+								<img src="../static/images/pic01.jpg" id="output" alt="" data-position="center center" />
 								<script>
 									var loadFile = function(event) {
 										var output = document.getElementById('output');
@@ -63,16 +64,19 @@
 							</a>
 							<div class="content">
 								<div class="inner">
-									<h2>Sed ipsum dolor</h2>
-									<p>Phasellus convallis elit id ullamcorper pulvinar. Duis aliquam turpis mauris, eu ultricies erat malesuada quis. Aliquam dapibus.</p>
-									<ul class="actions">
-										<li><a href="generic.html" class="button">Learn more</a></li>
-									</ul>
-									<input type="file" name="file" accept="image/*" onchange="loadFile(event)">
+									<h2>CLIP Classifier</h2>
+									<p>Choose image to classify.</p>
+										<input class="button" type="file" id="fileInput" name="file" accept="image/*" style="display: none;" onchange="loadFile(event)">
+										<input type="button" value="Browse" onclick="document.getElementById('fileInput').click();" />
+										<button class="button" value="Submit">Run</button>
+										<br><br>
+										<label class="content">{{ output }}</label>
+									</script>
 								</div>
 							</div>
 						</section>
 					</section>
+				</form>
 
 				<!-- Two -->
 					<section id="two" class="wrapper style3 fade-up">
@@ -188,13 +192,13 @@
 			</footer>
 
 		<!-- Scripts -->
-			<script src="assets/js/jquery.min.js"></script>
-			<script src="assets/js/jquery.scrollex.min.js"></script>
-			<script src="assets/js/jquery.scrolly.min.js"></script>
-			<script src="assets/js/browser.min.js"></script>
-			<script src="assets/js/breakpoints.min.js"></script>
-			<script src="assets/js/util.js"></script>
-			<script src="assets/js/main.js"></script>
+			<script src="../static/assets/js/jquery.min.js"></script>
+			<script src="../static/assets/js/jquery.scrollex.min.js"></script>
+			<script src="../static/assets/js/jquery.scrolly.min.js"></script>
+			<script src="../static/assets/js/browser.min.js"></script>
+			<script src="../static/assets/js/breakpoints.min.js"></script>
+			<script src="../static/assets/js/util.js"></script>
+			<script src="../static/assets/js/main.js"></script>
 
 	</body>
 </html>
