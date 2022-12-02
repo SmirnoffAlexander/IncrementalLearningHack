@@ -40,14 +40,20 @@
 				<!-- One -->
 					<section id="one" class="wrapper style2 fullscreen spotlights">
 						<section>
-							<a href="#" class="image">
+							<a id="ImgHolder" href="#" class="image">
 								<img src="images/pic01.jpg" id="output" alt="" data-position="center center" />
 								<script>
 									var loadFile = function(event) {
 										var output = document.getElementById('output');
-										output.src = URL.createObjectURL(event.target.files[0]);
-										output.width = 438;
-										output.height = 438;
+										var src = URL.createObjectURL(event.target.files[0]);
+										output.src = src
+										var parent = document.getElementById('ImgHolder');
+										console.log("url("+src+")")
+										parent.style.backgroundImage = "url("+src+")";
+										parent.style.backgroundImage.objectFit = 'contain';
+										output.max_width = output.width;
+										output.max_height = output.height;
+										output.backgroundSize = 'contain';
 										output.style.display = "block";
 										output.onload = function() {
 										URL.revokeObjectURL(output.src) // free memory

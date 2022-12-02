@@ -3005,7 +3005,8 @@ input, select, textarea {
 
 		.spotlights > section > .image {
 			background-position: center center;
-			background-size: cover;
+			background-size: contain;
+			background-repeat: no-repeat;
 			border-radius: 0;
 			display: block;
 			position: relative;
@@ -3013,11 +3014,6 @@ input, select, textarea {
 		}
 
 			.spotlights > section > .image img {
-				border-radius: 0;
-				display: block;
-			}
-
-			.spotlights > section > .image:before {
 				-moz-transition: opacity 1s ease;
 				-webkit-transition: opacity 1s ease;
 				-ms-transition: opacity 1s ease;
@@ -3025,13 +3021,17 @@ input, select, textarea {
 				background: rgba(49, 36, 80, 0.9);
 				content: '';
 				display: block;
-				height: 100%;
+				height: auto;
 				left: 0;
 				opacity: 0;
 				position: absolute;
 				top: 0;
-				width: 100%;
+				width: auto;
+				border-radius: 0;
+				display: block;
 			}
+
+			
 
 		.spotlights > section > .content {
 			padding: 4em 5em 2em 5em ;
