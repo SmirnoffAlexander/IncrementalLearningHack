@@ -14,8 +14,12 @@
 				<div class="inner">
 					<nav>
 						<ul>
-							<li><a href="#intro">Welcome</a></li>
-							<li><a href="#one">Inference</a></li>
+							<form method="post" action="/">
+								<input type="submit" value="welcome" name="action"/>
+                            </form>
+							<form method="post" action="/">
+								<input type="submit" value="inference" name="action"/>
+                            </form>
 							<li><a href="#two">Fine Tuning</a></li>
 							<li><a href="#three">Architecture</a></li>
 						</ul>
@@ -31,49 +35,15 @@
 						<div class="inner">
 							<h1>Incremental Learning</h1>
 							<p>ResNet50 incremental learning with Learing Without Forgetting and CLIP methods.</p>
-							<ul class="actions">
-								<li><a href="#one" class="button scrolly">Try it!</a></li>
-							</ul>
+							<form method="post" action="/">
+								<ul class="actions">
+									<input type="submit" value="try it!" name="action"/>
+								</ul>
+							</form>
 						</div>
 					</section>
 
-				<!-- One -->
-				<form method="post" name="form">
-					<section id="one" class="wrapper style2 fullscreen spotlights">
-						<section>
-							<a id="ImgHolder" href="#" class="image">
-								<img src="../static/images/pic01.jpg" id="output" alt="" data-position="center center" />
-								<script>
-									var loadFile = function(event) {
-										var output = document.getElementById('output');
-										var src = URL.createObjectURL(event.target.files[0]);
-										output.src = src
-										var parent = document.getElementById('ImgHolder');
-										console.log("url("+src+")")
-										parent.style.backgroundImage = "url("+src+")";
-										parent.style.backgroundImage.objectFit = 'contain';
-										output.max_width = output.width;
-										output.max_height = output.height;
-										output.backgroundSize = 'contain';
-										output.style.display = "block";
-										output.onload = function() {
-										URL.revokeObjectURL(output.src) // free memory
-										}
-									};
-								</script>
-							</a>
-							<div class="content">
-								<div class="inner">
-									<h2>CLIP Classifier</h2>
-									<p>Choose image to classify.</p>
-										<input class="button" type="file" id="fileInput" name="file" accept="image/*" style="display: none;" onchange="loadFile(event)">
-										<input type="button" value="Browse" onclick="document.getElementById('fileInput').click();" />
-										<button class="button" value="Submit">Run</button>
-								</div>
-							</div>
-						</section>
-					</section>
-				</form>
+				
 
 				<!-- Two -->
 					<section id="two" class="wrapper style3 fade-up">
