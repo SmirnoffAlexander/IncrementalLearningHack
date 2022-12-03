@@ -41,7 +41,7 @@ def clipInference(path: str="Inference/infer.jpg", plots_path: str = 'plotsInfer
     plot_img_name = os.path.join(plots_path, "plot_infer.jpg")
     img = Image.open(path)
 
-    model = ClipModel(class_names=main_classes)
+    model = ClipModel(class_names=main_classes, device='cpu')
     res_class, probs = model(img)
     class_inds = probs.argsort()[::-1][:5]
     pred_probs = probs[class_inds]
