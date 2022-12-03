@@ -33,28 +33,36 @@
             
             <!-- Wrapper -->
 			<div id="wrapper">
-                <!-- Two -->
-					<section id="two" class="wrapper fullscreen style2 fade-up">
-						<div class="inner">
-							<h2>Fine Tuning</h2>
-							<p>To train exsisting ResNet50 model with new data, follow this steps:</p>
-							<div class="features">
-								<section>
-									<span class="icon solid major fa-desktop"></span>
-									<h3>New class name</h3>
-									<p>Enter the <strong>new class name</strong> in the text field:</p>
-								</section>
-								<div class="content">
-									<form method="post" name="form" enctype="multipart/form-data">
-										<br>
-										<input class="button" type="string" id="fileName" name="newClass" style="display: block;"/>
-										<br>
-										<input type="submit" value="Train!" name="upload"/>
-									</form>
-								</div>
-							</div>
+                
+				
+				<!-- Two -->
+				<section id="two" class="wrapper fullscreen style2 fade-up">
+					<div class="inner">
+						<h2>Fine Tuning</h2>
+						<p>To train exsisting ResNet50 model with new data, follow this steps:</p>
+						<div class="features">
+							<section>
+								<span class="icon solid major fa-desktop"></span>
+								<h3>Folder structure</h3>
+								<p>Place each image in a directory with the <strong>class name of that image</strong>: For example, <strong>truck.jpg</strong>  should be placed in the <strong>directory - ./truck/truck.jpg</strong></p>
+							</section>
+							<section>
+								<span class="icon solid major fa-lock"></span>
+								<h3>Zip folder</h3>
+								<p>To upload a new dataset, archive the result of the previous step: <strong>&#60;ARCHIVE NAME&#62;.zip</strong></p>
+							</section>
 						</div>
-					</section>
+						<div class="inner">
+							<ul class="actions">
+								<form method="post" name="form" enctype="multipart/form-data">
+									<input class="button" type="file" id="fileZip" name="newData" style="display: none;">
+									<input type="button" value="Browse" onclick="document.getElementById('fileZip').click();" />
+									<input type="submit" value="Upload Dataset" name="upload"/>
+								</form>
+							</ul>
+						</div>
+					</div>
+				</section>
             </div>
 
 		<!-- Scripts -->

@@ -26,22 +26,26 @@ class ClipModel:
 
             logits_per_image, _ = self.model(image, text)
             probs = logits_per_image.softmax(dim=-1).cpu().numpy().ravel()
-            res_class = self.class_names[probs.argmax()]
+            res_class = np.array(self.class_names)[probs > 0.15] # TODO: I'VE CNAGED!!!!!!!!!
         return res_class, probs
 
-def clipInference(path: str="Inference/infer.jpg", plots_path: str = 'plotsInfer'):
-    with open('imagenet.json', 'r') as f:
-        image_net_names = json.load(f)
+def clipInference(
+    path: str="Inference/infer.jpg", 
+    plots_path: str = 'plotsInfer',
     main_classes = ["a tractor", "a lawnmower", "a bicycle", "a snowboard",
-                    "ski", "a truck", "a minibus", "a train", "a dump truck", "a horse"]
-    all_classes = main_classes + image_net_names
+                    "ski", "a truck", "a minibus", "a train", "a dump truck", "a horse", 'a skateboard'],
+    model = None,
+):
     if not os.path.exists(plots_path):
         os.makedirs(plots_path)
         
     plot_img_name = os.path.join(plots_path, "plot_infer.jpg")
     img = Image.open(path)
 
-    model = ClipModel(class_names=main_classes, device='cpu')
+    if model is None:
+        DEVICE = 'cuda' if torch.cuda.is_available() else 'cpu'
+        model = ClipModel(class_names=main_classes, device=DEVICE)
+
     res_class, probs = model(img)
     class_inds = probs.argsort()[::-1][:5]
     pred_probs = probs[class_inds]
