@@ -19,11 +19,14 @@ class ClipModel:
     def add_class(self, new_class_name):
         self.class_names.append(new_class_name)
 
+    def text_prepare(self):
+        self.emb_text = clip.tokenize(self.class_names).to(self.device)
+
     def __call__(self, image):
         image = self.preprocess(image).unsqueeze(0).to(self.device)
-        text = clip.tokenize(self.class_names).to(self.device)
+        #text = clip.tokenize(self.class_names).to(self.device)
+        text = self.emb_text
         with torch.no_grad():
-
             logits_per_image, _ = self.model(image, text)
             probs = logits_per_image.softmax(dim=-1).cpu().numpy().ravel()
             res_class = np.array(self.class_names)[probs > 0.15] # TODO: I'VE CNAGED!!!!!!!!!
@@ -77,4 +80,8 @@ if __name__ == "__main__":
             pred_probs = probs[class_inds]
             pred_classes = np.array(main_classes)[class_inds].tolist()
             fig = go.Figure([go.Bar(x=pred_classes, y=pred_probs)])
+            fig.update_layout(
+                paper_bgcolor="rgba(0,0,0,0)",
+                plot_bgcolor="rgba(0,0,0,0)"
+            )
             fig.write_image(plot_img_name)

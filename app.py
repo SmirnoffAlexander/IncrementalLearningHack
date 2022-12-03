@@ -53,13 +53,16 @@ def main():
             shutil.copyfile('Inference/infer.jpg', 'static/images/pic01.jpg')
             
             global clip_model
+            clip_model.text_prepare()
+            existed_classes = update_classes()
             predictions = clipInference(main_classes=existed_classes, model=clip_model)
 
+            shutil.copyfile('plotsInfer/plot_infer.jpg', 'static/images/plot.jpg')
             if len(predictions) > 1:
                 prediction = f"Predicted classes are {', '.join(predictions)}."
             else:
                 prediction = f'Predicted class is {predictions[0]}.'
-            return render_template("inference.html", output=prediction)
+            return render_template("inference.html", output=prediction, plot="../static/images/plot.jpg")
 
         #-------------------------------------
 
@@ -114,7 +117,38 @@ def main():
             with zipfile.ZipFile(zip_path, 'r') as zip_ref:
                 zip_ref.extractall(ds_path)
 
-            return render_template("test.html")
+            ## TEST CLIP
+            tp = 0
+            fp = 0
+            fn = 0
+            cnt = 0
+            existed_classes = update_classes()
+            clip_model.text_prepare()
+            class_cnt = len(os.listdir(ds_path))
+            for idx, class_name in enumerate(os.listdir(ds_path)):
+                print(f'{idx+1} class of {class_cnt}')
+                labels = class_name.split('_')
+                class_dir = os.path.join(ds_path, class_name)
+                for img in os.listdir(class_dir):
+                    if img[-3:] == 'jpg':
+                        cnt += 1
+                        img_path = os.path.join(class_dir, img)
+
+                        prediction = clipInference(path = img_path, main_classes=existed_classes, model=clip_model)
+                        
+                        cnt_tp = 0
+                        for label in labels:
+                            if label in prediction:
+                                tp += 1
+                                cnt_tp += 1
+                            else:
+                                fp += 1
+                        
+                        fn += len(prediction) - cnt_tp
+            
+            print(f'Recall is {100*tp/(tp+fp):.2f}; Precision is {100*tp/(tp+fn)}')
+
+            return render_template("test.html", metric_recall=f'Recall: {100*tp/(tp+fp):.2f}%', metric_precision=f'Precision: {100*tp/(tp+fn):.2f}%')
         #-------------------------------------
     else:
         pass 

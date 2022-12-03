@@ -41,10 +41,13 @@
 								<script>
 									var loadFile = function(event) {
 										var output = document.getElementById('output');
+										var plot = document.getElementById('plot_prob');
+
 										var src = URL.createObjectURL(event.target.files[0]);
 										output.src = src
 										var parent = document.getElementById('ImgHolder');
 										console.log("url("+src+")")
+
 										parent.style.backgroundImage = "url("+src+")";
 										parent.style.backgroundImage.objectFit = 'contain';
 										output.max_width = output.width;
@@ -58,7 +61,11 @@
 								</script>
 							</a>
 							<div class="content">
+								<br>
 								<div class="inner">
+									<img src="{{ plot }}" id="plot_prob" alt="" data-position="center center"/>
+							
+
 									<h2>CLIP Classifier</h2>
 									<p>Choose image to classify.</p>
 
