@@ -1,0 +1,96 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<title>Incremental Learning</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link rel="stylesheet" href="../static/assets/css/main.css" />
+		<noscript><link rel="stylesheet" href="../static/assets/css/noscript.css" /></noscript>
+	</head>
+	<body class="is-preload">
+
+		<!-- Sidebar -->
+			<section id="sidebar">
+				<div class="inner">
+					<nav>
+						<ul>
+                            <form method="post" action="/">
+								<input type="submit" value="welcome" name="action"/>
+                            </form>
+                            <form method="post" action="/">
+							    <input type="submit" value="inference" name="action"/>
+                            </form>
+							<form method="post" action="/">
+								<input type="submit" value="fine tuning" name="action"/>
+                            </form>
+							<form method="post" action="/">
+								<input type="submit" value="test" name="action"/>
+                            </form>
+						</ul>
+					</nav>
+				</div>
+			</section>
+            
+            <!-- Wrapper -->
+			<div id="wrapper">
+                <!-- One -->
+					<section id="one" class="wrapper style2 fullscreen spotlights">
+						<section>
+							<a id="ImgHolder" href="#" class="image">
+								<img src="../static/images/pic01.jpg" id="output" alt="" data-position="center center" />
+								<script>
+									var loadFile = function(event) {
+										var output = document.getElementById('output');
+										var plot = document.getElementById('plot_prob');
+
+										var src = URL.createObjectURL(event.target.files[0]);
+										output.src = src
+										var parent = document.getElementById('ImgHolder');
+										console.log("url("+src+")")
+
+										parent.style.backgroundImage = "url("+src+")";
+										parent.style.backgroundImage.objectFit = 'contain';
+										output.max_width = output.width;
+										output.max_height = output.height;
+										output.backgroundSize = 'contain';
+										output.style.display = "block";
+										output.onload = function() {
+										URL.revokeObjectURL(output.src) // free memory
+										}
+									};
+								</script>
+							</a>
+							<div class="content">
+								<br>
+								<div class="inner">
+									<img src="{{ plot }}" id="plot_prob" alt="" data-position="center center"/>
+							
+
+									<h2>CLIP Classifier</h2>
+									<p>Choose image to classify.</p>
+
+				                        <form method="post" name="form" enctype="multipart/form-data">
+										<input class="button" type="file" id="fileInput" name="file" accept="image/*" style="display: none;" onchange="loadFile(event)">
+										<input type="button" value="Browse" onclick="document.getElementById('fileInput').click();" />
+										<input type="submit" value="Run" name="upload"/>
+                                        <br><br>
+                                        <label class="content">{{ output }}</label>
+
+				                        </form>
+								</div>
+							</div>
+						</section>
+					</section>
+            </div>
+
+		<!-- Scripts -->
+			<script src="../static/assets/js/jquery.min.js"></script>
+			<script src="../static/assets/js/jquery.scrollex.min.js"></script>
+			<script src="../static/assets/js/jquery.scrolly.min.js"></script>
+			<script src="../static/assets/js/browser.min.js"></script>
+			<script src="../static/assets/js/breakpoints.min.js"></script>
+			<script src="../static/assets/js/util.js"></script>
+			<script src="../static/assets/js/main.js"></script>
+
+    </body>
+</html>
