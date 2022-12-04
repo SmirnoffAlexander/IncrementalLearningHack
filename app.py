@@ -1,14 +1,18 @@
-from flask import Flask, request, render_template
+from flask import Flask, request, render_template, send_file
 import os
 import shutil
 import zipfile
 import torch
 import json
 from clippper import clipInference, ClipModel
+from scrape_images import scraper
+from run import run_experiment
+#from gen_sd import generate_for_class
+import pandas as pd
 
 # Declare a Flask app
 app = Flask(__name__)
-app.config['UPLOAD_FOLDER'] = ['Inference', 'FineTune']
+app.config['UPLOAD_FOLDER'] = ['Inference', 'FineTune', 'Upload']
 app.config['MAX_CONTENT_PATH'] = 5000
 
 existed_path = './classes.json'
@@ -89,6 +93,30 @@ def main():
 
                 # 2nd LwF TRAIN
                 # TODO: TRAIN METHOD!!!!
+                # New Data
+                imgCount = 100
+                SynthCnt = 20
+                scraper(query="class_name", count=imgCount)
+                #generate_for_class([class_name], cnt=SynthCnt)
+
+                ## Train
+                _config = {
+                    'data_path': class_name,
+                    'num_epochs': 20,
+                    'T': 2,
+                    'alpha': 0.01,
+                    'num_new_class': 1,
+                    'device': 'cuda' if torch.cuda.is_available() else 'cpu',
+                    'lr': 1e-2,
+                    'momentum': 0.9,
+                    'weight_decay': 5e-4,
+                    'optimizer': 'SGD',
+                    'pretrained_weights_path': 'pretrained_weights/net.pth',
+                    'loss': 'CrossEntropy',
+                    'batch_size': 4,
+                    'num_workers': 4,
+                }
+                run_experiment(_config)
 
             return render_template("finetune.html")
         #-------------------------------------
@@ -125,30 +153,45 @@ def main():
             existed_classes = update_classes()
             clip_model.text_prepare()
             class_cnt = len(os.listdir(ds_path))
-            for idx, class_name in enumerate(os.listdir(ds_path)):
+            csv_anss = {'id': [], 'predict_1': [], 'predict_2': [], 'predict_3': []}
+            for idx, img in enumerate(sorted(os.listdir(ds_path))):
                 print(f'{idx+1} class of {class_cnt}')
-                labels = class_name.split('_')
-                class_dir = os.path.join(ds_path, class_name)
-                for img in os.listdir(class_dir):
-                    if img[-3:] == 'jpg':
-                        cnt += 1
-                        img_path = os.path.join(class_dir, img)
+                #labels = class_name.split('_')
+                #class_dir = os.path.join(ds_path, class_name)
+                #for img in os.listdir(class_dir):
+                if img[-3:] == 'jpg':
+                    cnt += 1
+                    csv_anss['id'].append(img[:-4])
+                    img_path = os.path.join(ds_path, img)
 
-                        prediction = clipInference(path = img_path, main_classes=existed_classes, model=clip_model)
-                        
-                        cnt_tp = 0
-                        for label in labels:
-                            if label in prediction:
-                                tp += 1
-                                cnt_tp += 1
-                            else:
-                                fp += 1
-                        
-                        fn += len(prediction) - cnt_tp
+                    prediction = clipInference(path = img_path, main_classes=existed_classes, model=clip_model).tolist()
+                    
+                    while len(prediction) < 3:
+                        prediction.append("")
+                    
+                    print(prediction)
+
+                    cols = ['predict_1', 'predict_2', 'predict_3']
+                    for col, els in zip(cols, prediction):
+                        csv_anss[col].append(els)
+
+                    '''DEPRECATED
+                    cnt_tp = 0
+                    for label in labels:
+                        if label in prediction:
+                            tp += 1
+                            cnt_tp += 1
+                        else:
+                            fp += 1
+                    
+                    fn += len(prediction) - cnt_tp
+                    '''
             
-            print(f'Recall is {100*tp/(tp+fp):.2f}; Precision is {100*tp/(tp+fn)}')
+            ans = pd.DataFrame(data=csv_anss)
+            ans.to_csv('./Test.csv', index=False)
+            print("saved")
 
-            return render_template("test.html", metric_recall=f'Recall: {100*tp/(tp+fp):.2f}%', metric_precision=f'Precision: {100*tp/(tp+fn):.2f}%')
+            return send_file('./Test.csv', as_attachment=True) #render_template("test.html")
         #-------------------------------------
     else:
         pass 

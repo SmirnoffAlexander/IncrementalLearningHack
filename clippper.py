@@ -29,7 +29,7 @@ class ClipModel:
         with torch.no_grad():
             logits_per_image, _ = self.model(image, text)
             probs = logits_per_image.softmax(dim=-1).cpu().numpy().ravel()
-            res_class = np.array(self.class_names)[probs > 0.15] # TODO: I'VE CNAGED!!!!!!!!!
+            res_class = np.array(self.class_names)[probs > 0.25] # TODO: I'VE CNAGED!!!!!!!!!
         return res_class, probs
 
 def clipInference(
