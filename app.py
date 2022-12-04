@@ -154,7 +154,7 @@ def main():
             clip_model.text_prepare()
             class_cnt = len(os.listdir(ds_path))
             csv_anss = {'id': [], 'predict_1': [], 'predict_2': [], 'predict_3': []}
-            for idx, img in enumerate(sorted(os.listdir(ds_path))):
+            for idx, img in enumerate(sorted(os.listdir(ds_path), key=lambda x: x[-3:]=='jpg' and int(x[:-4]))):
                 print(f'{idx+1} class of {class_cnt}')
                 #labels = class_name.split('_')
                 #class_dir = os.path.join(ds_path, class_name)
