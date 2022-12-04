@@ -7,8 +7,12 @@ import json
 from clippper import clipInference, ClipModel
 from scrape_images import scraper
 from run import run_experiment
-#from gen_sd import generate_for_class
+#from diff import generate_for_class NOT ENOUGH GPU MEMORY!!!
 import pandas as pd
+from PIL import Image
+import numpy as np
+import plotly.graph_objects as go
+from lwf_model import LWFModel
 
 # Declare a Flask app
 app = Flask(__name__)
@@ -56,13 +60,52 @@ def main():
             file.save(os.path.join(app.config['UPLOAD_FOLDER'][0], fname))
             shutil.copyfile('Inference/infer.jpg', 'static/images/pic01.jpg')
             
+            _config = {
+                        'data_path': 'None',
+                        'num_epochs': 20,
+                        'T': 2,
+                        'alpha': 0.01,
+                        'num_new_class': 1,
+                        'device': 'cuda' if torch.cuda.is_available() else 'cpu',
+                        'lr': 1e-2,
+                        'momentum': 0.9,
+                        'weight_decay': 5e-4,
+                        'optimizer': 'SGD',
+                        'pretrained_weights_path': 'pretrained_weights/net.pth',
+                        'loss': 'CrossEntropy',
+                        'batch_size': 4,
+                        'num_workers': 4,
+                    }
+
             global clip_model
             clip_model.text_prepare()
             existed_classes = update_classes()
-            predictions = clipInference(main_classes=existed_classes, model=clip_model)
+            predictions, probs = clipInference(main_classes=existed_classes, model=clip_model)
+            
+            lwf_img = Image.open('Inference/infer.jpg')
+            lwf_model = LWFModel(_config, classes=existed_classes)
+            lwf_prediction, lwf_probs = lwf_model(lwf_img)
+
+            for idx, pred in enumerate(predictions):
+                for el, prob in zip(lwf_prediction, lwf_probs):
+                    if el == pred:
+                        probs[idx] = probs[idx]*0.95+prob*0.05
+
+
+            plot_img_name = os.path.join('plotsInfer', "plot_infer.jpg")
+            class_inds = probs.argsort()[::-1][:5]
+            pred_probs = probs[class_inds]
+            pred_classes = np.array(existed_classes)[class_inds].tolist()
+            fig = go.Figure([go.Bar(x=pred_classes, y=pred_probs)])
+            fig.write_image(plot_img_name)
 
             shutil.copyfile('plotsInfer/plot_infer.jpg', 'static/images/plot.jpg')
-            if len(predictions) > 1:
+
+            predictions = predictions[probs > 0.3]
+
+            if len(predictions) == 0:
+                prediction = f"No class predicted."
+            elif len(predictions) > 1:
                 prediction = f"Predicted classes are {', '.join(predictions)}."
             else:
                 prediction = f'Predicted class is {predictions[0]}.'
@@ -82,9 +125,6 @@ def main():
             existed_classes = update_classes()
             if class_name not in existed_classes:
                 existed_classes.append(class_name)
-
-                with open(existed_path, 'w') as f:
-                    json.dump(existed_classes, f)
                 print('NEW CLASSES')
                 print(existed_classes)
 
@@ -96,12 +136,12 @@ def main():
                 # New Data
                 imgCount = 100
                 SynthCnt = 20
-                scraper(query="class_name", count=imgCount)
-                #generate_for_class([class_name], cnt=SynthCnt)
+                scraper(query=class_name, count=imgCount)
+                #generate_for_class([class_name], cnt=SynthCnt) # NOT ENOUGH GPU MEMORY!!!
 
                 ## Train
                 _config = {
-                    'data_path': class_name,
+                    'data_path': os.path.join('./training_data', class_name),
                     'num_epochs': 20,
                     'T': 2,
                     'alpha': 0.01,
@@ -117,6 +157,9 @@ def main():
                     'num_workers': 4,
                 }
                 run_experiment(_config)
+
+                with open(existed_path, 'w') as f:
+                    json.dump(existed_classes, f)
 
             return render_template("finetune.html")
         #-------------------------------------
@@ -164,8 +207,12 @@ def main():
                     csv_anss['id'].append(img[:-4])
                     img_path = os.path.join(ds_path, img)
 
-                    prediction = clipInference(path = img_path, main_classes=existed_classes, model=clip_model).tolist()
-                    
+                    prediction, probs = clipInference(path = img_path, main_classes=existed_classes, model=clip_model)
+                    prediction = prediction.tolist()
+
+                    prediction = np.array(prediction)[probs > 0.3]
+                    prediction = prediction.tolist()
+
                     while len(prediction) < 3:
                         prediction.append("")
                     
@@ -175,18 +222,7 @@ def main():
                     for col, els in zip(cols, prediction):
                         csv_anss[col].append(els)
 
-                    '''DEPRECATED
-                    cnt_tp = 0
-                    for label in labels:
-                        if label in prediction:
-                            tp += 1
-                            cnt_tp += 1
-                        else:
-                            fp += 1
-                    
-                    fn += len(prediction) - cnt_tp
-                    '''
-            
+
             ans = pd.DataFrame(data=csv_anss)
             ans.to_csv('./Test.csv', index=False)
             print("saved")

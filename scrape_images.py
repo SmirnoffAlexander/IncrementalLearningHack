@@ -19,7 +19,7 @@ def createFolder(directory):
 
 def scraper(query, count):
 
-    createFolder('./'+query+'/')
+    createFolder('./training_data/'+query+'/')
 
     options = webdriver.FirefoxOptions()
     options.add_argument('--headless')
