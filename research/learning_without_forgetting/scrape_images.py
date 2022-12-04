@@ -17,7 +17,7 @@ def createFolder(directory):
         print('Error: Creating directory. ' + directory)
 
 
-def run(query, count):
+def scraper(query, count):
 
     createFolder('./'+query+'/')
 
@@ -84,4 +84,4 @@ def run(query, count):
 
 if __name__ == "__main__":
     imgCount = 300
-    run(query="bicycle", count=imgCount)
+    scraper(query="bicycle", count=imgCount)
